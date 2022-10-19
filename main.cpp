@@ -15,44 +15,20 @@
 #endif
 
 #include <cstdlib>
+#include <iostream>
+#include "Tortue.h"
 
-/*class Point*/
-class Point {
-public :
-    //coordonnées x, y et z du point
-    double x;
-    double y;
-    double z;
-    // couleur r, v et b du point
-    float r;
-    float g;
-    float b;
-};
-
-//Tableau pour stocker les sommets du cube et leur couleur
-Point pCube[8] = {
-        {-0.5, -0.5, 0.5,  1.0, 0.0, 0.0},
-        {0.5,  -0.5, 0.5,  0.0, 1.0, 0.0},
-        {0.5,  -0.5, -0.5, 0.0, 0.0, 1.0},
-        {-0.5, -0.5, -0.5, 1.0, 1.0, 1.0},
-        {-0.5, 0.5,  0.5,  1.0, 0.0, 0.0},
-        {0.5,  0.5,  0.5,  0.0, 1.0, 0.0},
-        {0.5,  0.5,  -0.5, 0.0, 0.0, 1.0},
-        {-0.5, 0.5,  -0.5, 1.0, 1.0, 1.0}};
-
-//Tableau pour stocker les indices des sommets par face pour le cube
-int fCube[6][4] = {
-        {0, 3, 2, 1},
-        {0, 1, 5, 4},
-        {1, 2, 6, 5},
-        {2, 3, 7, 6},
-        {0, 4, 7, 3},
-        {4, 5, 6, 7}};
+using namespace std;
 
 char presse;
 int anglex, angley, x, y, xold, yold;
+Tortue *tortue1 = new Tortue(0, 0, 0);
+Tortue *tortue2 = new Tortue(-2, 0, -2);
+Tortue *tortue3 = new Tortue(2, 0, -2);
+Tortue *tortue4 = new Tortue(-2, 0, 2);
+Tortue *tortue5 = new Tortue(2, 0, 2);
+double zoom = 2;
 
-/* Prototype des fonctions */
 void affichage();
 
 void clavier(unsigned char touche, int x, int y);
@@ -72,7 +48,13 @@ int main(int argc, char **argv) {
     glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH);
     glutInitWindowPosition(200, 200);
     glutInitWindowSize(500, 500);
-    glutCreateWindow("cube");
+    glutCreateWindow("Tortue");
+
+    /* Mise en place de la projection perspective */
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    gluPerspective(45, 1, 0.5, 50.0);
+    glMatrixMode(GL_MODELVIEW);
 
     /* Initialisation d'OpenGL */
     glClearColor(0.0, 0.0, 0.0, 0.0);
@@ -86,12 +68,21 @@ int main(int argc, char **argv) {
     glutReshapeFunc(reshape);
     glutMouseFunc(mouse);
     glutMotionFunc(mousemotion);
+    glutIdleFunc(idle);
 
     /* Entree dans la boucle principale glut */
     glutMainLoop();
     return 0;
 }
 
+void idle() {
+    tortue1->IdleAnimation();
+    tortue2->IdleAnimation();
+    tortue3->IdleAnimation();
+    tortue4->IdleAnimation();
+    tortue5->IdleAnimation();
+    glutPostRedisplay();
+}
 
 void affichage() {
     int i, j;
@@ -101,8 +92,17 @@ void affichage() {
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
+    gluLookAt(0.0, 0, zoom,
+              0.0, 0.0, 0.0,
+              0.0, zoom, 0.0);
     glRotatef(angley, 1.0, 0.0, 0.0);
     glRotatef(anglex, 0.0, 1.0, 0.0);
+
+    tortue1->draw();
+    tortue2->draw();
+    tortue3->draw();
+    tortue4->draw();
+    tortue5->draw();
 
     //Repère
     //axe x en rouge
@@ -157,6 +157,16 @@ void clavier(unsigned char touche, int x, int y) {
             glPolygonMode(GL_FRONT, GL_LINE);
             glutPostRedisplay();
             break;
+        case 'z':
+            zoom--;
+            cout << zoom << endl;
+            glutPostRedisplay();
+            break;
+        case 'Z':
+            zoom++;
+            cout << zoom << endl;
+            glutPostRedisplay();
+            break;
         case 'q' : /*la touche 'q' permet de quitter le programme */
             exit(0);
     }
@@ -179,6 +189,19 @@ void mouse(int button, int state, int x, int y) {
     /* si on relache le bouton gauche */
     if (button == GLUT_LEFT_BUTTON && state == GLUT_UP)
         presse = 0; /* le booleen presse passe a 0 (faux) */
+
+    switch (button) {
+        case 3:
+            zoom = zoom - 0.05;
+            glutPostRedisplay();
+            break;
+        case 4:
+            zoom = zoom + 0.05;
+            glutPostRedisplay();
+            break;
+        default:
+            break;
+    }
 }
 
 void mousemotion(int x, int y) {
