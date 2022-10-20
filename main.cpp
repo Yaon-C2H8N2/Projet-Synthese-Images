@@ -17,16 +17,18 @@
 #include <cstdlib>
 #include <iostream>
 #include "Tortue.h"
+#include "Primitives/Cube.h"
 
 using namespace std;
 
 char presse;
 int anglex, angley, x, y, xold, yold;
-Tortue *tortue1 = new Tortue(0, 0, 0);
-Tortue *tortue2 = new Tortue(-2, 0, -2);
-Tortue *tortue3 = new Tortue(2, 0, -2);
-Tortue *tortue4 = new Tortue(-2, 0, 2);
-Tortue *tortue5 = new Tortue(2, 0, 2);
+Tortue *tortues[5] = {new Tortue(0, 0, 0),
+                  new Tortue(-2, 0, -2),
+                  new Tortue(2, 0, -2),
+                  new Tortue(-2, 0, 2),
+                  new Tortue(2, 0, 2)};
+Cube *cube = new Cube(50,50,50);
 double zoom = 2;
 
 void affichage();
@@ -53,7 +55,7 @@ int main(int argc, char **argv) {
     /* Mise en place de la projection perspective */
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    gluPerspective(45, 1, 0.5, 50.0);
+    gluPerspective(45, 1, 0.5, 100.0);
     glMatrixMode(GL_MODELVIEW);
 
     /* Initialisation d'OpenGL */
@@ -76,11 +78,11 @@ int main(int argc, char **argv) {
 }
 
 void idle() {
-    tortue1->IdleAnimation();
-    tortue2->IdleAnimation();
-    tortue3->IdleAnimation();
-    tortue4->IdleAnimation();
-    tortue5->IdleAnimation();
+    tortues[0]->IdleAnimation();
+    tortues[1]->IdleAnimation();
+    tortues[2]->IdleAnimation();
+    tortues[3]->IdleAnimation();
+    tortues[4]->IdleAnimation();
     glutPostRedisplay();
 }
 
@@ -98,11 +100,11 @@ void affichage() {
     glRotatef(angley, 1.0, 0.0, 0.0);
     glRotatef(anglex, 0.0, 1.0, 0.0);
 
-    tortue1->draw();
-    tortue2->draw();
-    tortue3->draw();
-    tortue4->draw();
-    tortue5->draw();
+    tortues[0]->draw();
+    tortues[1]->draw();
+    tortues[2]->draw();
+    tortues[3]->draw();
+    tortues[4]->draw();
 
     //Repère
     //axe x en rouge
@@ -126,12 +128,15 @@ void affichage() {
 
     glFlush();
 
+    cube->draw();
+
     //On echange les buffers
     glutSwapBuffers();
 }
 
 void clavier(unsigned char touche, int x, int y) {
     switch (touche) {
+        int trucAFaireSauter;
         case 'p': /* affichage du carre plein */
             glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
             glutPostRedisplay();
@@ -165,6 +170,11 @@ void clavier(unsigned char touche, int x, int y) {
         case 'Z':
             zoom++;
             cout << zoom << endl;
+            glutPostRedisplay();
+            break;
+        case ' ':
+            trucAFaireSauter = rand()%5;
+            tortues[trucAFaireSauter]->posY = 2;
             glutPostRedisplay();
             break;
         case 'q' : /*la touche 'q' permet de quitter le programme */

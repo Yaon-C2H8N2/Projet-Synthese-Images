@@ -106,4 +106,7 @@ void Tortue::draw() {
 
 void Tortue::IdleAnimation() {
     frameAnim += 0.1;
+    if(posY>0){
+        posY -= 0.0981;
+    }
 }

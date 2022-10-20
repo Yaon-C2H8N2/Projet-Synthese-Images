@@ -15,6 +15,8 @@ public:
 
     void draw();
 
+    void jumpAnimation(float);
+
     void IdleAnimation();
 };
 
