@@ -18,8 +18,14 @@ void Tortue::draw() {
      * Proto carapace
      */
     glPushMatrix();
-    glColor3f(0, 1, 0);
-    glTranslatef(posX+0, posY+0, posZ+0);
+    GLfloat ambiante[] = {0.2, 0.2, 0.2, 1.0};
+    GLfloat diffuse[] = {0, 0.5, 0, 1.0};
+
+    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,
+                 ambiante);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE,
+                 diffuse);
+    glTranslatef(posX + 0, posY + 0, posZ + 0);
     glScalef(0.5, 0.35, 0.6);
     glutSolidSphere(1, 18, 18);
     glPopMatrix();
@@ -28,8 +34,7 @@ void Tortue::draw() {
      * Proto tête
      */
     glPushMatrix();
-    glColor3f(0, 1, 0);
-    glTranslatef(posX+0, posY+0, posZ+0.75);
+    glTranslatef(posX + 0, posY + 0, posZ + 0.75);
     glutSolidSphere(0.2, 18, 18);
     glPopMatrix();
 
@@ -37,13 +42,19 @@ void Tortue::draw() {
      * Yeux
      */
     glPushMatrix();
-    glColor3f(1, 1, 1);
-    glTranslatef(posX+0.13, posY+0.15, posZ+0.83);
+    GLfloat ambiante_yeux[] = {0.2, 0.2, 0.2, 1.0};
+    GLfloat diffuse_yeux[] = {1, 1, 1, 1.0};
+
+    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,
+                 ambiante_yeux);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE,
+                 diffuse_yeux);
+    glTranslatef(posX + 0.13, posY + 0.15, posZ + 0.83);
     glutSolidSphere(0.03, 9, 9);
     glPopMatrix();
     glPushMatrix();
     glColor3f(1, 1, 1);
-    glTranslatef(posX+(-0.13), posY+0.15, posZ+0.83);
+    glTranslatef(posX + (-0.13), posY + 0.15, posZ + 0.83);
     glutSolidSphere(0.03, 9, 9);
     glPopMatrix();
 
@@ -51,10 +62,14 @@ void Tortue::draw() {
      * Proto patte avant gauche
      */
     glPushMatrix();
+    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,
+                 ambiante);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE,
+                 diffuse);
     glColor3f(0, 1, 0);
-    glTranslatef(posX+0.5, posY+0, posZ+0.4);
+    glTranslatef(posX + 0.5, posY + 0, posZ + 0.4);
     glTranslatef(-0.15, 0, 0);
-    glRotatef(45 * sin(frameAnim), 0, 1, 0);
+    glRotatef(35 * sin(frameAnim), 0, 1, 0);
     glTranslatef(0.15, 0, 0);
     glRotatef(90, 0, 1, 0);
     glScalef(0.15, 0.15, 0.3);
@@ -66,9 +81,9 @@ void Tortue::draw() {
      */
     glPushMatrix();
     glColor3f(0, 1, 0);
-    glTranslatef(posX+(-0.5), posY+0, posZ+0.4);
+    glTranslatef(posX + (-0.5), posY + 0, posZ + 0.4);
     glTranslatef(0.15, 0, 0);
-    glRotatef(45 * sin(frameAnim), 0, -1, 0);
+    glRotatef(35 * sin(frameAnim), 0, -1, 0);
     glTranslatef(-0.15, 0, 0);
     glRotatef(90, 0, 1, 0);
     glScalef(0.15, 0.15, 0.3);
@@ -80,9 +95,9 @@ void Tortue::draw() {
      */
     glPushMatrix();
     glColor3f(0, 1, 0);
-    glTranslatef(posX+0.5, posY+0, posZ+(-0.4));
+    glTranslatef(posX + 0.5, posY + 0, posZ + (-0.4));
     glTranslatef(-0.15, 0, 0);
-    glRotatef(45 * cos(frameAnim), 0, 1, 0);
+    glRotatef(35 * cos(frameAnim), 0, 1, 0);
     glTranslatef(0.15, 0, 0);
     glRotatef(90, 0, 1, 0);
     glScalef(0.15, 0.15, 0.3);
@@ -94,9 +109,9 @@ void Tortue::draw() {
      */
     glPushMatrix();
     glColor3f(0, 1, 0);
-    glTranslatef(posX+(-0.5), posY+0, posZ+(-0.4));
+    glTranslatef(posX + (-0.5), posY + 0, posZ + (-0.4));
     glTranslatef(0.15, 0, 0);
-    glRotatef(45 * cos(frameAnim), 0, -1, 0);
+    glRotatef(35 * cos(frameAnim), 0, -1, 0);
     glTranslatef(-0.15, 0, 0);
     glRotatef(-90, 0, 1, 0);
     glScalef(0.15, 0.15, 0.3);
@@ -106,7 +121,5 @@ void Tortue::draw() {
 
 void Tortue::IdleAnimation() {
     frameAnim += 0.1;
-    if(posY>0){
-        posY -= 0.0981;
-    }
+    if (frameAnim > 2 * M_PI)frameAnim = 0;
 }

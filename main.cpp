@@ -16,22 +16,29 @@
 
 #include <cstdlib>
 #include <iostream>
+#include <cmath>
 #include "Tortue.h"
 #include "Primitives/Cube.h"
+#include <jpeglib.h>
+#include <jerror.h>
 
 using namespace std;
-
+//
 char presse;
 int anglex, angley, x, y, xold, yold;
+const unsigned int largimg = 300, hautimg = 168;
+unsigned char image[largimg * hautimg * 3];
 Tortue *tortues[5] = {new Tortue(0, 0, 0),
-                  new Tortue(-2, 0, -2),
-                  new Tortue(2, 0, -2),
-                  new Tortue(-2, 0, 2),
-                  new Tortue(2, 0, 2)};
-Cube *cube = new Cube(50,50,50);
+                      new Tortue(-2, 0, -2),
+                      new Tortue(2, 0, -2),
+                      new Tortue(-2, 0, 2),
+                      new Tortue(2, 0, 2)};
+Cube *cube = new Cube(50, 50, 50);
 double zoom = 2;
 
 void affichage();
+
+void clavierTouchesSpeciales(int touche, int x, int y);
 
 void clavier(unsigned char touche, int x, int y);
 
@@ -43,6 +50,10 @@ void mouse(int bouton, int etat, int x, int y);
 
 void mousemotion(int x, int y);
 
+void gestionLumiere();
+
+void loadJpegImage(char *fichier);
+
 int main(int argc, char **argv) {
     /* initialisation de glut et creation
        de la fenetre */
@@ -51,6 +62,9 @@ int main(int argc, char **argv) {
     glutInitWindowPosition(200, 200);
     glutInitWindowSize(500, 500);
     glutCreateWindow("Tortue");
+
+    /* Chargement de la texture */
+    loadJpegImage("/home/yaon/Documents/Projet-Synthese-Images/fond_marin.jpeg");
 
     /* Mise en place de la projection perspective */
     glMatrixMode(GL_PROJECTION);
@@ -67,10 +81,18 @@ int main(int argc, char **argv) {
     /* enregistrement des fonctions de rappel */
     glutDisplayFunc(affichage);
     glutKeyboardFunc(clavier);
+    glutSpecialFunc(clavierTouchesSpeciales);
     glutReshapeFunc(reshape);
     glutMouseFunc(mouse);
     glutMotionFunc(mousemotion);
     glutIdleFunc(idle);
+
+    /* Parametrage du placage de textures */
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, largimg, hautimg, 0,
+                 GL_RGB, GL_UNSIGNED_BYTE, image);
+    glEnable(GL_TEXTURE_2D);
 
     /* Entree dans la boucle principale glut */
     glutMainLoop();
@@ -106,6 +128,8 @@ void affichage() {
     tortues[3]->draw();
     tortues[4]->draw();
 
+    gestionLumiere();
+
     //Repère
     //axe x en rouge
     glBegin(GL_LINES);
@@ -134,9 +158,32 @@ void affichage() {
     glutSwapBuffers();
 }
 
+void clavierTouchesSpeciales(int touche, int x, int y) {
+    switch (touche) {
+        case GLUT_KEY_LEFT:
+            anglex = anglex - 1;
+            if (anglex < 0) anglex = 360;
+            break;
+        case GLUT_KEY_RIGHT:
+            anglex = anglex + 1;
+            if (anglex > 360) anglex = 0;
+            break;
+        case GLUT_KEY_DOWN:
+            angley = angley + 1;
+            if (angley > 360) angley = 0;
+            break;
+        case GLUT_KEY_UP:
+            angley = angley - 1;
+            if (angley < 0) angley = 360;
+            break;
+    }
+    glutPostRedisplay();
+}
+
+double frameAnimTouche = 0;
+
 void clavier(unsigned char touche, int x, int y) {
     switch (touche) {
-        int trucAFaireSauter;
         case 'p': /* affichage du carre plein */
             glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
             glutPostRedisplay();
@@ -164,17 +211,18 @@ void clavier(unsigned char touche, int x, int y) {
             break;
         case 'z':
             zoom--;
-            cout << zoom << endl;
             glutPostRedisplay();
             break;
         case 'Z':
             zoom++;
-            cout << zoom << endl;
             glutPostRedisplay();
             break;
         case ' ':
-            trucAFaireSauter = rand()%5;
-            tortues[trucAFaireSauter]->posY = 2;
+            frameAnimTouche += 0.1;
+            for (auto i: tortues) {
+                i->posY = sin(frameAnimTouche) / 2;
+            }
+            if (frameAnimTouche > 2 * M_PI)frameAnimTouche = 0;
             glutPostRedisplay();
             break;
         case 'q' : /*la touche 'q' permet de quitter le programme */
@@ -227,4 +275,83 @@ void mousemotion(int x, int y) {
 
     xold = x; /* sauvegarde des valeurs courante de le position de la souris */
     yold = y;
+}
+
+void gestionLumiere() {
+    /*
+     * Lumière générale de la scène
+     * Ambiance bleutée pour les fonds marins
+     */
+    GLfloat position_source0[] = {10.0, 10.0, 10.0, 0.0};
+    GLfloat dif_0[] = {1.0, 1.0, 1.0, 1.0};
+    GLfloat amb_0[] = {0.4, 0.4, 1, 1.0};
+    GLfloat spec_0[] = {1.0, 1.0, 1.0, 1.0};
+
+    glLightfv(GL_LIGHT0, GL_POSITION, position_source0);
+    glLightfv(GL_LIGHT0, GL_AMBIENT, amb_0);
+    glLightfv(GL_LIGHT0, GL_DIFFUSE, dif_0);
+    glLightfv(GL_LIGHT0, GL_SPECULAR, spec_0);
+
+    /*
+     * Réflexion fond marin, bleu foncé.
+     * Lumière en spot afin d'atteindre une cible restreinte.
+     * Se voit particulièrement bien dans les yeux de la bête.
+     */
+    GLfloat position_source1[] = {0.0, -1.0, 0.0, 0.0};
+    GLfloat dir[] = {0.0, 1.0, 0.0};
+    GLfloat dif_1[] = {0.0, 0.0, 1.0, 1.0};
+    GLfloat spec_1[] = {1.0, 1.0, 1.0, 1.0};
+
+    glLightfv(GL_LIGHT1, GL_POSITION, position_source1);
+    glLightfv(GL_LIGHT1, GL_DIFFUSE, dif_1);
+    glLightfv(GL_LIGHT1, GL_SPECULAR, spec_1);
+    glLightfv(GL_LIGHT1, GL_SPOT_DIRECTION, dir);
+    glLightf(GL_LIGHT1, GL_SPOT_CUTOFF, 45);
+    glLightf(GL_LIGHT1, GL_SPOT_EXPONENT, 4.0);
+
+    glEnable(GL_LIGHT0);
+    glEnable(GL_LIGHT1);
+    glEnable(GL_LIGHTING);
+}
+
+void loadJpegImage(char *fichier) {
+    struct jpeg_decompress_struct cinfo;
+    struct jpeg_error_mgr jerr;
+    FILE *file;
+    unsigned char *ligne;
+
+    cinfo.err = jpeg_std_error(&jerr);
+    jpeg_create_decompress(&cinfo);
+#ifdef __WIN32
+    if (fopen_s(&file,fichier,"rb") != 0)
+      {
+        fprintf(stderr,"Erreur : impossible d'ouvrir le fichier texture.jpg\n");
+        exit(1);
+      }
+#elif __GNUC__
+    if ((file = fopen(fichier, "rb")) == 0) {
+        fprintf(stderr, "Erreur : impossible d'ouvrir le fichier texture.jpg\n");
+        exit(1);
+    }
+#endif
+    jpeg_stdio_src(&cinfo, file);
+    jpeg_read_header(&cinfo, TRUE);
+
+    if ((cinfo.image_width != largimg) || (cinfo.image_height != hautimg)) {
+        fprintf(stdout, "Erreur : l'image doit etre de taille %dx%d\n", largimg, hautimg);
+        exit(1);
+    }
+    if (cinfo.jpeg_color_space == JCS_GRAYSCALE) {
+        fprintf(stdout, "Erreur : l'image doit etre de type RGB\n");
+        exit(1);
+    }
+
+    jpeg_start_decompress(&cinfo);
+    ligne = image;
+    while (cinfo.output_scanline < cinfo.output_height) {
+        ligne = image + 3 * hautimg * cinfo.output_scanline;
+        jpeg_read_scanlines(&cinfo, &ligne, 1);
+    }
+    jpeg_finish_decompress(&cinfo);
+    jpeg_destroy_decompress(&cinfo);
 }
