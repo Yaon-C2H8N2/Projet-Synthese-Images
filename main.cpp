@@ -87,13 +87,6 @@ int main(int argc, char **argv) {
     glutMotionFunc(mousemotion);
     glutIdleFunc(idle);
 
-    /* Parametrage du placage de textures */
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, largimg, hautimg, 0,
-                 GL_RGB, GL_UNSIGNED_BYTE, image);
-    glEnable(GL_TEXTURE_2D);
-
     /* Entree dans la boucle principale glut */
     glutMainLoop();
     return 0;
@@ -129,26 +122,6 @@ void affichage() {
     tortues[4]->draw();
 
     gestionLumiere();
-
-    //Repère
-    //axe x en rouge
-    glBegin(GL_LINES);
-    glColor3f(1.0, 0.0, 0.0);
-    glVertex3f(0, 0, 0.0);
-    glVertex3f(1, 0, 0.0);
-    glEnd();
-    //axe des y en vert
-    glBegin(GL_LINES);
-    glColor3f(0.0, 1.0, 0.0);
-    glVertex3f(0, 0, 0.0);
-    glVertex3f(0, 1, 0.0);
-    glEnd();
-    //axe des z en bleu
-    glBegin(GL_LINES);
-    glColor3f(0.0, 0.0, 1.0);
-    glVertex3f(0, 0, 0.0);
-    glVertex3f(0, 0, 1.0);
-    glEnd();
 
     glFlush();
 

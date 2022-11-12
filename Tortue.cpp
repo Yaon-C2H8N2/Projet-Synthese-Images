@@ -39,33 +39,9 @@ void Tortue::draw() {
     glPopMatrix();
 
     /*
-     * Yeux
-     */
-    glPushMatrix();
-    GLfloat ambiante_yeux[] = {0.2, 0.2, 0.2, 1.0};
-    GLfloat diffuse_yeux[] = {1, 1, 1, 1.0};
-
-    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,
-                 ambiante_yeux);
-    glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE,
-                 diffuse_yeux);
-    glTranslatef(posX + 0.13, posY + 0.15, posZ + 0.83);
-    glutSolidSphere(0.03, 9, 9);
-    glPopMatrix();
-    glPushMatrix();
-    glColor3f(1, 1, 1);
-    glTranslatef(posX + (-0.13), posY + 0.15, posZ + 0.83);
-    glutSolidSphere(0.03, 9, 9);
-    glPopMatrix();
-
-    /*
      * Proto patte avant gauche
      */
     glPushMatrix();
-    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,
-                 ambiante);
-    glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE,
-                 diffuse);
     glColor3f(0, 1, 0);
     glTranslatef(posX + 0.5, posY + 0, posZ + 0.4);
     glTranslatef(-0.15, 0, 0);
@@ -116,6 +92,26 @@ void Tortue::draw() {
     glRotatef(-90, 0, 1, 0);
     glScalef(0.15, 0.15, 0.3);
     glutSolidSphere(1, 18, 18);
+    glPopMatrix();
+
+    /*
+     * Yeux
+     */
+    glPushMatrix();
+    GLfloat ambiante_yeux[] = {0.2, 0.2, 0.2, 1.0};
+    GLfloat diffuse_yeux[] = {1, 1, 1, 1.0};
+
+    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,
+                 ambiante_yeux);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE,
+                 diffuse_yeux);
+    glTranslatef(posX + 0.13, posY + 0.15, posZ + 0.83);
+    glutSolidSphere(0.03, 9, 9);
+    glPopMatrix();
+    glPushMatrix();
+    glColor3f(1, 1, 1);
+    glTranslatef(posX + (-0.13), posY + 0.15, posZ + 0.83);
+    glutSolidSphere(0.03, 9, 9);
     glPopMatrix();
 }
 

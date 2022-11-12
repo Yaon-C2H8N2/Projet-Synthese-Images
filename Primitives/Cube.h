@@ -22,8 +22,6 @@ public:
     Cube(double hauteur, double largeur, double profondeur);
 
     void draw();
-
-    void draw()
 };
 
 
