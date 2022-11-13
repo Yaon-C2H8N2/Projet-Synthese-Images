@@ -25,8 +25,14 @@ using namespace std;
 //
 char presse;
 int anglex, angley, x, y, xold, yold;
+/*
+ * Dimensions de l'image contenant la texture
+ */
 const unsigned int largimg = 300, hautimg = 168;
 unsigned char image[largimg * hautimg * 3];
+/*
+ * Initialisation des tortues apparaissants dans la scène
+ */
 Tortue *tortues[5] = {new Tortue(0, 0, 0),
                       new Tortue(-2, 0, -2),
                       new Tortue(2, 0, -2),
@@ -94,6 +100,9 @@ int main(int argc, char **argv) {
     return 0;
 }
 
+/*
+ * Fonction appelée pour l'animation passive
+ */
 void idle() {
     tortues[0]->IdleAnimation();
     tortues[1]->IdleAnimation();
@@ -117,21 +126,34 @@ void affichage() {
     glRotatef(angley, 1.0, 0.0, 0.0);
     glRotatef(anglex, 0.0, 1.0, 0.0);
 
+    /*
+     * Affichage des tortues
+     */
     tortues[0]->draw();
     tortues[1]->draw();
     tortues[2]->draw();
     tortues[3]->draw();
     tortues[4]->draw();
 
+    /*
+     * Affichage des lumières
+     */
     gestionLumiere();
 
     glFlush();
+
+    /*
+     * Cube sur lequel appliquer la texture de fond marin
+     */
     glutSolidCube(50);
 
     //On echange les buffers
     glutSwapBuffers();
 }
 
+/*
+ * Fonctions des touches pour tourner la caméra
+ */
 void clavierTouchesSpeciales(int touche, int x, int y) {
     switch (touche) {
         case GLUT_KEY_LEFT:
@@ -154,6 +176,9 @@ void clavierTouchesSpeciales(int touche, int x, int y) {
     glutPostRedisplay();
 }
 
+/*
+ * Fonctions des touches alphanumériques
+ */
 double frameAnimTouche = 0;
 
 void clavier(unsigned char touche, int x, int y) {
@@ -192,6 +217,9 @@ void clavier(unsigned char touche, int x, int y) {
             glutPostRedisplay();
             break;
         case ' ':
+            /*
+             * Animation de nage
+             */
             frameAnimTouche += 0.1;
             for (auto i: tortues) {
                 i->posY = sin(frameAnimTouche) / 2;
@@ -219,9 +247,11 @@ void mouse(int button, int state, int x, int y) {
         yold = y;
     }
     /* si on relache le bouton gauche */
-    if (button == GLUT_LEFT_BUTTON && state == GLUT_UP)
-        presse = 0; /* le booleen presse passe a 0 (faux) */
+    if (button == GLUT_LEFT_BUTTON && state == GLUT_UP)presse = 0; /* le booleen presse passe a 0 (faux) */
 
+    /*
+     * switch pour le zoom à la souris en plus du zoom au clavier
+     */
     switch (button) {
         case 3:
             zoom = zoom - 0.05;
