@@ -18,7 +18,6 @@
 #include <iostream>
 #include <cmath>
 #include "Tortue.h"
-#include "Primitives/Cube.h"
 #include <jpeglib.h>
 #include <jerror.h>
 
@@ -33,7 +32,6 @@ Tortue *tortues[5] = {new Tortue(0, 0, 0),
                       new Tortue(2, 0, -2),
                       new Tortue(-2, 0, 2),
                       new Tortue(2, 0, 2)};
-Cube *cube = new Cube(50, 50, 50);
 double zoom = 2;
 
 void affichage();
@@ -63,14 +61,18 @@ int main(int argc, char **argv) {
     glutInitWindowSize(500, 500);
     glutCreateWindow("Tortue");
 
-    /* Chargement de la texture */
-    loadJpegImage("/home/yaon/Documents/Projet-Synthese-Images/fond_marin.jpeg");
-
     /* Mise en place de la projection perspective */
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     gluPerspective(45, 1, 0.5, 100.0);
     glMatrixMode(GL_MODELVIEW);
+
+    /* Parametrage du placage de textures */
+    /*glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, largimg, hautimg, 0,
+                 GL_RGB, GL_UNSIGNED_BYTE, image);
+    glEnable(GL_TEXTURE_2D);*/
 
     /* Initialisation d'OpenGL */
     glClearColor(0.0, 0.0, 0.0, 0.0);
@@ -124,8 +126,7 @@ void affichage() {
     gestionLumiere();
 
     glFlush();
-
-    cube->draw();
+    glutSolidCube(50);
 
     //On echange les buffers
     glutSwapBuffers();

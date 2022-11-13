@@ -6,6 +6,8 @@
 #define PROJET_SYNTHESE_IMAGES_TORTUE_H
 
 
+#include "Primitives/Cylindre.h"
+
 class Tortue {
 public:
     double posX, posY, posZ;

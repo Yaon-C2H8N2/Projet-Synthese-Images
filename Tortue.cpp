@@ -20,7 +20,6 @@ void Tortue::draw() {
     glPushMatrix();
     GLfloat ambiante[] = {0.2, 0.2, 0.2, 1.0};
     GLfloat diffuse[] = {0, 0.5, 0, 1.0};
-
     glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,
                  ambiante);
     glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE,
@@ -93,6 +92,20 @@ void Tortue::draw() {
     glScalef(0.15, 0.15, 0.3);
     glutSolidSphere(1, 18, 18);
     glPopMatrix();
+
+    /*
+     * Base chapeau
+     */
+    Cylindre cylindreBaseChapeau(10, 0.03, 0.15);
+    cylindreBaseChapeau.translate(posX + 0, posY + 0.18, posZ + 0.75);
+    cylindreBaseChapeau.draw();
+
+    /*
+     * Corps chapeau
+     */
+    Cylindre cylindreCorpsChapeau(10, 0.3, 0.1);
+    cylindreCorpsChapeau.translate(posX + 0, posY + 0.20, posZ + 0.75);
+    cylindreCorpsChapeau.draw();
 
     /*
      * Yeux
